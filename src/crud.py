@@ -1,14 +1,22 @@
-from fastapi import FastAPI,HTTPException,status
+from fastapi import FastAPI,HTTPException,status,Form,Request
+from fastapi.responses import HTMLResponse,RedirectResponse
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from typing import List
 
 app = FastAPI()
-class MessageCreate(BaseModel):
-    content : str
-class Message(BaseModel):
-    id : int
-    content : str
+templates = Jinja2Templates(directory="templates")
+app.mount("/static",StaticFiles(directory="static"),name="static")
 
-messages_db:list[Message] = [Message(id=0, content="First post")]
+class MessageCreate(BaseModel):
+    content: str
+
+class Message(BaseModel):
+    id: int
+    content: str
+
+messages_db: List[Message] = [Message(id=0,content="Первое сообщение")]
 
 @app.get("/messages",response_model=list[Message])
 async def read_messages() -> list[Message]:
@@ -49,3 +57,27 @@ async def delete_message(message_id: int) -> dict:
 async def delete_messages() -> dict:
     messages_db.clear()
     return {"detail": "All messages deleted!"}
+
+# -----------------------------------------------------------------
+
+@app.get("/web/messages",response_class=HTMLResponse)
+async def get_page_of_message(request: Request):
+    return templates.TemplateResponse("index.html",{"request":request,"messages":messages_db})
+
+@app.get("/web/messages/create",response_class=HTMLResponse)
+async def get_create_message_page(request:Request):
+    return templates.TemplateResponse("create.html",{"request":request})
+
+@app.post("/web/messages")
+async def form_of_create_message(content: str = Form(...)):
+    next_id = max((msg.id for msg in messages_db), default=-1) + 1
+    n_message = Message(id=next_id, content=content)
+    messages_db.append(n_message)
+    return RedirectResponse(url="/web/messages", status_code=status.HTTP_303_SEE_OTHER)
+
+@app.get("/web/messages/{message_id}", response_class=HTMLResponse)
+async def get_message_detail_page(request: Request, message_id: int):
+    for message in messages_db:
+        if message.id == message_id:
+            return templates.TemplateResponse("detail.html", {"request": request, "message": message})
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Сообщение не найдено")
