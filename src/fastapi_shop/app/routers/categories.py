@@ -4,6 +4,8 @@ from app.models.categories import Category as CategoryModel
 from app.schemas import Category as CategorySchema, CategoryCreate
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db_depends import get_async_db
+from app.models.users import User as UserModel
+from app.auth import get_current_admin
 
 router = APIRouter(
     prefix="/categories",
@@ -17,20 +19,20 @@ async def get_all_categories(db: AsyncSession = Depends(get_async_db)):
     return categories
 
 @router.post("/", response_model=CategorySchema, status_code=status.HTTP_201_CREATED)
-async def create_category(category: CategoryCreate, db: AsyncSession = Depends(get_async_db)):
+async def create_category(category: CategoryCreate, db: AsyncSession = Depends(get_async_db),current_user : UserModel = Depends(get_current_admin)):
     if category.parent_id is not None:
         stmt = select(CategoryModel).where(CategoryModel.id == category.parent_id,CategoryModel.is_active == True)
         result = await db.scalars(stmt)
         parent = result.first()
         if parent is None:
             raise HTTPException(status_code=400, detail="Parent category not found")
-    db_category = CategoryModel(**category.model_dump())
+    db_category = CategoryModel(**category.model_dump(),)
     db.add(db_category)
     await db.commit()
     return db_category
 
 @router.put("/{category_id}", response_model=CategorySchema)
-async def update_category(category_id: int, category: CategoryCreate, db: AsyncSession = Depends(get_async_db)):
+async def update_category(category_id: int, category: CategoryCreate, db: AsyncSession = Depends(get_async_db),current_user : UserModel = (get_current_admin)):
     stmt = select(CategoryModel).where(CategoryModel.id == category_id,CategoryModel.is_active == True)
     result = await db.scalars(stmt)
     db_category = result.first()
@@ -50,7 +52,7 @@ async def update_category(category_id: int, category: CategoryCreate, db: AsyncS
     return db_category
 
 @router.delete("/{category_id}", response_model=CategorySchema)
-async def delete_category(category_id: int, db: AsyncSession = Depends(get_async_db)):
+async def delete_category(category_id: int, db: AsyncSession = Depends(get_async_db),current_user : Depends(get_current_admin)):
     stmt = select(CategoryModel).where(CategoryModel.id == category_id,CategoryModel.is_active == True)
     result = await db.scalars(stmt)
     db_category = result.first()
