@@ -48,7 +48,7 @@ async def get_current_user(token : str = Depends(oauth2_scheme),db : AsyncSessio
     except jwt.ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail = "Token has expired",
+            detail = "Срок действия токена истек",
             headers={"WWW-Authenticate": "Bearer"},
         )
     except jwt.PyJWTError:
@@ -63,7 +63,7 @@ async def get_current_seller(current_user : UserModel = Depends(get_current_user
     if current_user.role != "seller":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail = "Only sellers can perform this action"
+            detail = "Только продавцы могут выполнять это действие"
         )
     return current_user
 
@@ -71,7 +71,15 @@ async def get_current_admin(current_user: UserModel = Depends(get_current_user))
     if current_user.role != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="You do not have administrative privileges"
+            detail="Вы не имеете административных прав"
         )
     return current_user
 
+
+async def get_current_buyer(current_user: UserModel = Depends(get_current_user)):
+    if current_user.role != "buyer":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Вы не имеете административных прав"
+        )
+    return current_user

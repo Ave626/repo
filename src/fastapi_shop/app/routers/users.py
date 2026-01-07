@@ -28,14 +28,14 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSessi
         select(UserModel).where(UserModel.email == form_data.username, UserModel.is_active == True))
     user = result.first()
     if not user or not verify_password(form_data.password, user.hashed_password):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="Incorrect email or password",headers={"WWW-Authenticate": "Bearer"},)
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="Неправильный логин или пароль",headers={"WWW-Authenticate": "Bearer"},)
     access_token = create_acess_token(data={"sub": user.email, "role": user.role, "id": user.id})
     refresh_token = create_refresh_token(data={"sub": user.email, "role": user.role, "id": user.id})
     return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
 
 @router.post("/refresh-token")
 async def refresh_token(body: RefreshTokenRequest,db: AsyncSession = Depends(get_async_db),):
-    credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="Could not validate refresh token",headers={"WWW-Authenticate": "Bearer"},)
+    credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="Не удалось валидировать refresh-roken",headers={"WWW-Authenticate": "Bearer"},)
     old_refresh_token = body.refresh_token
     try:
         payload = jwt.decode(old_refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -58,7 +58,7 @@ async def refresh_token(body: RefreshTokenRequest,db: AsyncSession = Depends(get
 async def get_new_access_token(body : RefreshTokenRequest,db : AsyncSession = Depends(get_async_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate refresh token",
+        detail="Не удалось валидировать refresh-token",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
@@ -78,5 +78,4 @@ async def get_new_access_token(body : RefreshTokenRequest,db : AsyncSession = De
         "role": user.role,
         "id" : user.id
     })
-
     return {"acess_token": new_acces_token,"token_type" : "bearer"}

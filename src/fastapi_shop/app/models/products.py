@@ -1,7 +1,7 @@
-from sqlalchemy import String,Boolean,Integer,Numeric,ForeignKey
+from sqlalchemy import String,Boolean,Integer,Numeric,ForeignKey,Float,text
 from decimal import Decimal
 from sqlalchemy.orm import Mapped,mapped_column,relationship
-
+from typing import List
 from app.database import Base
 
 class Product(Base):
@@ -12,8 +12,10 @@ class Product(Base):
     price : Mapped[Decimal] = mapped_column(Numeric(10,2))
     image_url: Mapped[str | None] = mapped_column(String(200))
     stock : Mapped[int] = mapped_column(Integer,nullable=False)
+    rating : Mapped[float] = mapped_column(Float,default=0.0,server_default=text('0'))
     is_active : Mapped[bool] = mapped_column(Boolean,default=True)
     category_id : Mapped[int] = mapped_column(ForeignKey("categories.id"))
-    category : Mapped["Category"] = relationship("Category",back_populates="products")
     seller_id : Mapped[int] = mapped_column(ForeignKey("users.id"),nullable=False)
+    category : Mapped["Category"] = relationship("Category",back_populates="products")
     seller : Mapped["User"] = relationship("User",back_populates="products")
+    reviews : Mapped[List["Review"]] = relationship("Review",back_populates="product")

@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Mapped,mapped_column,relationship
 from sqlalchemy import Boolean,Integer,String
 from app.database import Base
+from typing import List
 
 class User(Base):
     __tablename__= "users"
@@ -10,3 +11,4 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(Boolean,default=True)
     role : Mapped[str] = mapped_column(String,default="buyer")
     products : Mapped[list["Product"]] = relationship("Product",back_populates="seller")
+    reviews : Mapped[List["Review"]] = relationship("Review",back_populates="user")
