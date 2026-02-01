@@ -1,4 +1,4 @@
-from fastapi import APIRouter,Depends,Heade,HTTPException,status
+from fastapi import APIRouter,Depends,Header,HTTPException,status
 from typing import List
 from app.core.dependencies import get_category_service
 from app.schemas.category import Category,CategoryBase
