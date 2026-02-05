@@ -5,7 +5,7 @@ class PostBase(BaseModel):
     content : str
     category_id : int
 
-class Post(PostBase):
+class PostRead(PostBase):
     id : int
     model_config = ConfigDict(from_attributes=True)
     

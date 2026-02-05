@@ -12,6 +12,7 @@ async def read_post(category_id : int | None = None,skip : int = 0,limit : int =
         posts = await post_service.get_posts_by_category(category_id = category_id,skip=skip,limit=limit)
         if posts is None:
             raise HTTPException(status_code=404, detail="Категория не найдена")
+        return posts
     else:
         posts = await post_service.get_all_posts(skip=skip,limit=limit)
         return posts

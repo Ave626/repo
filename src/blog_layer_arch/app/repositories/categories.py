@@ -8,7 +8,7 @@ class CategoryRepository:
         self.db = db
     
     async def get_by_id(self,category_id : int) -> Category | None:
-        result = await self.db.scalar(select(Category).filre(Category.id == category_id))
+        result = await self.db.scalar(select(Category).filter(Category.id == category_id))
         return result
 
     async def get_by_name(self,name : str) -> Category | None:
