@@ -17,6 +17,7 @@ app.include_router(users.router)
 app.include_router(reviews.router)
 app.include_router(cart.router)
 app.include_router(orders.router)
+
 @app.middleware("http")
 async def log_middleware(request: Request, call_next):
     log_id = str(uuid4())

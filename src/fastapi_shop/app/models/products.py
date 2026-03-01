@@ -1,6 +1,6 @@
 from sqlalchemy import String,Boolean,Integer,Numeric,ForeignKey,Float,text,DateTime,func,Index,Computed
 from datetime import datetime
-from decimal import Decimal
+from decimal import Decimal ё
 from sqlalchemy.orm import Mapped,mapped_column,relationship
 from typing import List
 from app.database import Base

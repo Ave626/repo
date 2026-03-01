@@ -134,7 +134,8 @@ async def create_product(
 
 @router.get("/category/{category_id}", response_model=list[ProductSchema])
 async def get_products_by_category(category_id: int, db: AsyncSession = Depends(get_async_db)):
-    stmt = await db.scalars(select(CategoryModel).where(CategoryModel.id == category_id,CategoryModel.is_active == True))
+    stmt = await db.scalars(
+        select(CategoryModel).where(CategoryModel.id == category_id,CategoryModel.is_active == True))
     category = stmt.first()
     if not category:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Категория не найдена или не активна")
