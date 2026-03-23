@@ -48,8 +48,8 @@
 
 1. Клонируйте репозиторий:
    ```bash
-   git clone [https://github.com/ВАШ_ЮЗЕРНЕЙМ/ВАШ_РЕПОЗИТОРИЙ.git](https://github.com/ВАШ_ЮЗЕРНЕЙМ/ВАШ_РЕПОЗИТОРИЙ.git)
-   cd ВАШ_РЕПОЗИТОРИЙ/src/fastapi_shop
+   git clone [https://github.com/Ave626/repo.git](https://github.com/Ave626/repo.git)
+   cd repo/src/fastapi_shop
 Создайте файл .env на основе примера (если требуется) и настройте переменные окружения.
 
 Запустите проект через Docker Compose:
